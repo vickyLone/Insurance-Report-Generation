@@ -69,7 +69,7 @@ table, th, td {
 						class="btn btn-primary"></td>
 					<td><a href="/" type="reset" class="btn btn-secondary">Reset</a></td>
 					<td>Export:</td>
-					<td><a href="" class="btn btn-info">Excel</a> <a href=""
+					<td><a href="/excel" class="btn btn-info">Excel</a> <a href="/pdf"
 						class="btn btn-dark">Pdf</a></td>
 
 				</tr>

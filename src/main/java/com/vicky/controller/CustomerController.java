@@ -1,11 +1,9 @@
 package com.vicky.controller;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +13,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.lowagie.text.DocumentException;
 import com.vicky.entity.Customer;
 import com.vicky.formBinder.SearchRequest;
 import com.vicky.service.CustomerService;
-import com.vicky.utils.ExcelGenerator;
 
 @Controller
 public class CustomerController {
 
 	@Autowired
 	private CustomerService service;
-
 
 	@PostMapping("/search")
 	public String searchButton(@ModelAttribute("searchRequest") SearchRequest search, Model model) {
@@ -38,10 +35,9 @@ public class CustomerController {
 
 	}
 
-	
 	@GetMapping("/")
 	public String loadIndexPage(Model model) {
-		
+
 		model.addAttribute("searchRequest", new SearchRequest());
 		init(model);
 
@@ -55,27 +51,26 @@ public class CustomerController {
 	}
 
 	@GetMapping("/excel")
-	public void getExcelFile(HttpServletResponse response) throws IOException {
+	public String getExcelFile(HttpServletResponse response, Model model) throws Exception {
 
-		response.setContentType("application/octet-stream");
-		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-		String currentDateTime = dateFormatter.format(new Date());
+		service.generateExcel(response);
 
-		String headerKey = "Content-Disposition";
-		String headerValue = "attachment;filename=Reports" + currentDateTime + ".xlsx";
-		response.setHeader(headerKey, headerValue);
+		model.addAttribute("searchRequest", new SearchRequest());
+		init(model);
 
-		List<Customer> excel = service.getAll();
-		ExcelGenerator generator = new ExcelGenerator(excel);
-		generator.generateExcelFile(response);
-		
+		return "index";
 
 	}
-    
-	
-    
-	
-	
-	
-	
+
+	@GetMapping("/pdf")
+	public String exportToPdfFile(HttpServletResponse response, Model model) throws IOException, DocumentException, MessagingException {
+
+		service.generatePdf(response);
+
+		model.addAttribute("searchRequest", new SearchRequest());
+		init(model);
+
+		return "index";
+	}
+
 }
